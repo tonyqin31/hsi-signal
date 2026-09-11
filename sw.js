@@ -1,5 +1,5 @@
 /* 恆指每日訊號 service worker */
-const CACHE = "hsi-signal-v1";
+const CACHE = "hsi-signal-v2";
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./icon-180.png"];
 
 self.addEventListener("install", (e) => {
@@ -21,8 +21,9 @@ self.addEventListener("fetch", (e) => {
   let url;
   try { url = new URL(req.url); } catch (err) { return; }
   if (url.origin !== location.origin) return;
+  const isNav = req.mode === "navigate";
   e.respondWith(
-    fetch(req)
+    fetch(req, isNav ? { cache: "reload" } : undefined)
       .then((res) => {
         const copy = res.clone();
         caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
