@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="恆指訊號" />
+<meta name="theme-color" content="#0b1220" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%230b1220'/%3E%3Ctext x='90' y='122' font-size='96' text-anchor='middle' fill='%234da3ff' font-family='sans-serif'%3E%E7%89%9B%3C/text%3E%3C/svg%3E" />
+<title>恆指每日訊號</title>
+<style>
+:root{--bg:#0b1220;--card:#141d31;--card2:#101828;--line:#243149;--fg:#e9effb;
+--dim:#8ea3c6;--up:#31d07a;--down:#ff5c7a;--warn:#ffb020;--accent:#4da3ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);
+font:16px/1.6 -apple-system,BlinkMacSystemFont,"PingFang HK","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+padding-bottom:calc(env(safe-area-inset-bottom) + 28px);-webkit-text-size-adjust:100%}
+header{position:sticky;top:0;z-index:9;padding:calc(env(safe-area-inset-top) + 12px) 16px 10px;
+background:rgba(11,18,32,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header h1{margin:0;font-size:18px;letter-spacing:.4px}
+header .sub{margin:4px 0 0;font-size:12px;color:var(--dim)}
+main{padding:14px 12px 0;max-width:720px;margin:0 auto}
+section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+h2{margin:0 0 10px;font-size:14px;color:var(--dim);font-weight:600;letter-spacing:.6px}
+.hero{background:linear-gradient(160deg,#16233c,#101828);border-color:#2c3d5e}
+.hero .tag{display:inline-block;font-size:12px;padding:2px 9px;border-radius:99px;background:#1c2b47;color:var(--dim)}
+.hero .act{font-size:26px;font-weight:700;margin:10px 0 2px;line-height:1.3}
+.hero .act.go{color:var(--up)} .hero .act.wait{color:var(--dim)}
+.hero .meta{font-size:13px;color:var(--dim);margin-top:6px}
+.krow{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.krow:last-child{border-bottom:0}
+.krow .k{color:var(--dim);flex:0 0 auto}
+.krow .v{text-align:right;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:7px 4px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+th{color:var(--dim);font-weight:500;font-size:12px}
+th:first-child,td:first-child{text-align:left}
+tr.today td{background:#1b2a45}
+tr.today td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+.pill{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:#1c2b47;color:var(--dim)}
+.pill.go{background:#123726;color:var(--up)} .pill.exit{background:#3a2418;color:var(--warn)}
+.btnrow{display:flex;gap:8px;margin-top:10px}
+button,a.btn{flex:1;display:block;text-align:center;text-decoration:none;appearance:none;
+border:1px solid var(--line);background:#1b2740;color:var(--fg);
+font-size:15px;font-weight:600;padding:11px;border-radius:12px}
+button:active,a.btn:active{background:#243354}
+button[disabled]{opacity:.5}
+.card{border:1px solid var(--line);border-radius:13px;padding:11px;margin:9px 0;background:var(--card2)}
+.card .code{font-size:17px;font-weight:700;letter-spacing:.5px}
+.card .nm{font-size:13px;color:var(--dim);margin-left:6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin-top:8px;font-size:14px}
+.grid>div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #1e2a41;padding-bottom:4px}
+.grid .k{color:var(--dim)} .grid .v{font-variant-numeric:tabular-nums}
+.note{font-size:12.5px;color:var(--dim);line-height:1.65}
+.warn{border-left:3px solid var(--warn);padding-left:10px;color:#e7d3ac;font-size:13px;margin-top:10px}
+.st{font-size:12.5px;color:var(--dim);margin-top:8px;min-height:18px;line-height:1.6}
+.up{color:var(--up)} .down{color:var(--down)} .wn{color:var(--warn)} .ac{color:var(--accent)}
+footer{padding:6px 16px 20px;color:var(--dim);font-size:11.5px;text-align:center;max-width:720px;margin:0 auto}
+</style>
+</head>
+<body>
+<header>
+  <h1>🐂 恆指每日訊號</h1>
+  <p class="sub" id="hdr">載入中…</p>
+</header>
+<main>
+  <section class="hero">
+    <span class="tag">今日行動</span>
+    <div class="act wait" id="act">—</div>
+    <div class="meta" id="actmeta"></div>
+  </section>
+
+  <section>
+    <h2>本週行動表</h2>
+    <table><thead><tr><th>日期</th><th>星期</th><th>行動</th></tr></thead>
+    <tbody id="weekbody"></tbody></table>
+    <p class="note" style="margin-top:8px">規則：逢週一、週二 15:55 前買入牛證，翌日 09:30 開盤賣出。只做多，其餘日子空倉。</p>
+  </section>
+
+  <section>
+    <h2>即時數據</h2>
+    <div class="krow"><span class="k">恆指</span><span class="v" id="hsi">—</span></div>
+    <div class="krow"><span class="k">今日變動</span><span class="v" id="hsiChg">—</span></div>
+    <div class="btnrow"><button id="btn">更新即時數據</button></div>
+    <div class="st" id="status">未抓取。</div>
+    <div id="picks"></div>
+    <div class="btnrow"><a class="btn" id="etnetlink" href="https://www.etnet.com.hk/www/tc/warrants/realtime/index.php" target="_blank" rel="noopener">自己上 etnet 睇牛熊證全表 ↗</a></div>
+  </section>
+
+  <section>
+    <h2>牛證揀選準則</h2>
+    <div class="krow"><span class="k">發行商</span><span class="v">法興 / 匯豐 / 摩通 / 瑞銀</span></div>
+    <div class="krow"><span class="k">收回價距離</span><span class="v ac">≥ 600 點</span></div>
+    <div class="krow"><span class="k">距到期</span><span class="v">≥ 3 個月</span></div>
+    <div class="krow"><span class="k">買賣差價</span><span class="v">≤ 1 個價位</span></div>
+    <div class="krow"><span class="k">到期日</span><span class="v">揀最遠（時間值損耗慢）</span></div>
+    <div class="note" style="margin-top:8px">收回價距離 = 恆指現價 − 收回價。距離越大，被強制收回嘅機會越低。</div>
+  </section>
+
+  <section>
+    <h2>統計依據（10 年）</h2>
+    <table>
+      <thead><tr><th>隔夜時段</th><th>樣本</th><th>平均(點)</th><th>t 值</th></tr></thead>
+      <tbody>
+        <tr><td>週一 收→翌開</td><td>474</td><td class="up">+29.77</td><td>+3.50</td></tr>
+        <tr><td>週二 收→翌開</td><td>495</td><td class="up">+22.66</td><td>+2.83</td></tr>
+        <tr><td>週三 收→翌開</td><td>497</td><td>+12.72</td><td>+1.42</td></tr>
+        <tr><td>週四 收→翌開</td><td>504</td><td class="down">-7.10</td><td>-0.66</td></tr>
+        <tr><td>週五 收→翌開</td><td>488</td><td class="down">-1.72</td><td>-0.16</td></tr>
+      </tbody>
+    </table>
+    <p class="note" style="margin-top:8px">週一＋週二合併：<b>969 晚，平均 +26.13 點，t = +4.49</b>。<br>
+    樣本外（後半 5 年）t 跌到 <b>+2.46</b>，效力減半。</p>
+  </section>
+
+  <section>
+    <h2>單位與風控</h2>
+    <div class="krow"><span class="k">落單規模</span><span class="v">1 手 = 10,000 股</span></div>
+    <div class="krow"><span class="k">1 恆指點</span><span class="v">= 1 元</span></div>
+    <div class="krow"><span class="k">1 個價位（0.001 元）</span><span class="v">= 10 元</span></div>
+    <div class="krow"><span class="k">1 格（0.01 元）</span><span class="v ac">= 100 元</span></div>
+    <div class="krow"><span class="k">止損</span><span class="v wn">唔設（隔夜跳空止唔到）</span></div>
+    <div class="krow"><span class="k">持倉</span><span class="v">只過一夜，翌日 09:30 必走</span></div>
+    <div class="warn">最差一晚（2018-02-05）恆指跌 1,217 點 = 1 手蝕約 <b>1,217 元</b>。<br>
+    如果平均買賣差價係 2 個價位，edge 只剩 23%，<b>立即停手</b>。</div>
+  </section>
+</main>
+<footer>僅供研究，非投資建議。訊號基於歷史統計，唔保證將來有效。<br>報價延遲最少 15 分鐘，落單前請用券商報價核對。</footer>
+
+<script>
+"use strict";
+var ISON = /^https?:$/.test(location.protocol);
+var WD = ["日","一","二","三","四","五","六"];
+var ENTRY_DOW = [1,2], EXIT_DOW = [2,3];
+var CFG = { recoveryMin: 600, minDays: 90, lot: 10000, entryBy: "15:55", exitAt: "09:30" };
+var ISSUER_MAP = [["法興","SG"],["摩通","JP"],["匯豐","HS"],["瑞銀","UB"],["法巴","BP"],
+  ["信證","CI"],["華泰","HU"],["中銀","BI"],["星展","DS"],["摩利","ML"],["花旗","CT"],
+  ["國君","GJ"],["高盛","GS"],["瑞通","VT"],["東亞","EA"],["渣打","SC"],["大摩","MS"],
+  ["摩根","MS"],["野村","NM"],["麥銀","MB"],["海通","HT"],["巴克萊","BC"]];
+var ALLOWED = { SG:"法興", HS:"匯豐", JP:"摩根大通", UB:"瑞銀" };
+var RATIOS = [5000,8000,10000,12000,15000,18000,20000,25000,30000,40000,50000];
+var SEED = {"t": "2026-09-12 02:55", "px": 24805.63, "prev": 24954.47, "rows": [["54246", "恒指法興八十牛１", 23308, 23208, 0.17, 0.413, 100000, 780], ["56999", "恒指法興八甲牛Ｘ", 23328, 23228, 0.168, 0.413, 110000, 810], ["55280", "恒指瑞銀八乙牛Ｈ", 23350, 23250, 0.167, 0.461, 2850000, 839], ["55950", "恒指摩通八九牛Ｑ", 23350, 23250, 0.167, 0.461, 220000, 748], ["55750", "恒指法興八九牛９", 23358, 23258, 0.165, 0.413, 0, 748], ["59209", "恒指法興八甲牛１", 23378, 23278, 0.163, 0.413, 50000, 810], ["55025", "恒指摩通八九牛Ｃ", 23400, 23300, 0.164, 0.542, 770000, 748], ["57454", "恒指瑞銀八十牛Ｖ", 23400, 23300, 0.161, 0.421, 750000, 780], ["53765", "恒指摩通八九牛４", 23416, 23316, 0.158, 0.364, 18900, 748], ["54220", "恒指法興八十牛Ｙ", 23416, 23316, 0.157, 0.324, 1290000, 780], ["54553", "恒指瑞銀八九牛Ａ", 23416, 23316, 0.156, 0.284, 25100, 748], ["54808", "恒指匯豐八八牛Ｂ", 23416, 23316, 0.157, 0.324, 260000, 719], ["56153", "恒指瑞銀八九牛Ｏ", 23438, 23338, 0.156, 0.372, 0, 748], ["56409", "恒指法興八十牛Ｏ", 23448, 23348, 0.154, 0.332, 180000, 780], ["55183", "恒指瑞銀八九牛Ｈ", 23450, 23350, 0.154, 0.34, 760000, 748], ["55516", "恒指摩通八八牛Ｄ", 23450, 23350, 0.159, 0.542, 0, 719], ["56307", "恒指匯豐八八牛Ｊ", 23450, 23350, 0.154, 0.34, 0, 719], ["57083", "恒指法興八九牛５", 23468, 23368, 0.154, 0.413, 1300000, 748], ["55760", "恒指法興八甲牛Ｉ", 23478, 23378, 0.151, 0.332, 420000, 810], ["58809", "恒指瑞銀八十牛Ｋ", 23478, 23378, 0.153, 0.413, 230000, 780], ["55607", "恒指匯豐八九牛Ｇ", 23480, 23380, 0.151, 0.34, 10000, 748], ["55327", "恒指瑞銀八乙牛Ｚ", 23500, 23400, 0.075, 0.38, 12500, 839], ["55943", "恒指摩通八九牛Ｅ", 23500, 23400, 0.151, 0.421, 530000, 748], ["56846", "恒指摩通八乙牛６", 23500, 23400, 0.077, 0.542, 260000, 839], ["59606", "恒指匯豐八八牛１", 23500, 23400, 0.149, 0.34, 30000, 719], ["62418", "恒指法興八十牛９", 23500, 23400, 0.074, 0.3, 1290000, 780], ["58518", "恒指摩通八八牛１", 23520, 23420, 0.151, 0.501, 0, 719], ["59182", "恒指法興八九牛Ｑ", 23528, 23428, 0.145, 0.292, 40000, 748], ["54986", "恒指摩通八九牛Ｒ", 23542, 23442, 0.145, 0.348, 5790000, 748], ["57447", "恒指瑞銀八十牛Ｔ", 23550, 23450, 0.145, 0.38, 110000, 780], ["57769", "恒指匯豐八九牛５", 23550, 23450, 0.144, 0.34, 0, 748], ["56306", "恒指匯豐八八牛Ｈ", 23580, 23480, 0.138, 0.219, 1030000, 719], ["56381", "恒指法興八十牛Ｊ", 23588, 23488, 0.141, 0.372, 0, 780], ["56856", "恒指摩通八乙牛７", 23600, 23500, 0.141, 0.421, 1930000, 839], ["58806", "恒指瑞銀八十牛１", 23600, 23500, 0.136, 0.219, 19200, 780], ["57061", "恒指法興八十牛Ｔ", 23608, 23508, 0.139, 0.372, 0, 780], ["55277", "恒指瑞銀八乙牛Ｃ", 23616, 23516, 0.136, 0.284, 16800, 839], ["55488", "恒指摩通八八牛Ａ", 23616, 23516, 0.138, 0.364, 7490000, 719], ["55597", "恒指匯豐八九牛Ｅ", 23616, 23516, 0.133, 0.163, 11800, 748], ["55752", "恒指法興八九牛Ｄ", 23616, 23516, 0.136, 0.284, 1670000, 748], ["55944", "恒指摩通八九牛Ｈ", 23616, 23516, 0.202, 2.944, 0, 748], ["56148", "恒指瑞銀八九牛Ｍ", 23616, 23516, 0.134, 0.203, 34200, 748], ["57779", "恒指匯豐八九牛Ｃ", 23650, 23550, 0.133, 0.3, 0, 748], ["60111", "恒指摩通八八牛Ｒ", 23650, 23550, 0.138, 0.501, 0, 719], ["60401", "恒指瑞銀八十牛Ｎ", 23650, 23550, 0.134, 0.34, 260000, 780], ["63397", "恒指法興八乙牛Ｆ", 23658, 23558, 0.134, 0.372, 480000, 839], ["59160", "恒指法興八九牛２", 23688, 23588, 0.129, 0.292, 1710000, 748], ["58535", "恒指摩通八八牛Ｅ", 23700, 23600, 0.132, 0.461, 450000, 719], ["58801", "恒指瑞銀八十牛Ｘ", 23700, 23600, 0.128, 0.3, 630000, 780], ["59683", "恒指匯豐八八牛８", 23700, 23600, 0.127, 0.259, 21800, 719], ["60412", "恒指法興八十牛Ｇ", 23728, 23628, 0.125, 0.292, 240000, 780], ["60785", "恒指瑞銀八十牛Ｄ", 23738, 23638, 0.125, 0.332, 0, 780], ["56903", "恒指摩通八九牛Ｕ", 23750, 23650, 0.125, 0.38, 1270000, 748], ["57412", "恒指瑞銀八十牛Ｏ", 23750, 23650, 0.121, 0.219, 20900, 780], ["57780", "恒指匯豐八九牛Ｗ", 23750, 23650, 0.122, 0.259, 8800000, 748], ["57135", "恒指法興八甲牛Ｒ", 23768, 23668, 0.121, 0.292, 720000, 810], ["61411", "恒指瑞銀八十牛８", 23768, 23668, 0.12, 0.251, 0, 780], ["59693", "恒指匯豐八八牛９", 23800, 23700, 0.117, 0.259, 580000, 719], ["60113", "恒指摩通八八牛Ｔ", 23800, 23700, 0.121, 0.421, 2990000, 719], ["61866", "恒指瑞銀八乙牛Ｎ", 23800, 23700, 0.119, 0.34, 400000, 839], ["61466", "恒指法興八十牛Ｑ", 23808, 23708, 0.116, 0.251, 650000, 780], ["61281", "恒指摩通八七牛Ｓ", 23820, 23720, 0.181, 2.92, 0, 686], ["61555", "恒指匯豐八九牛８", 23828, 23728, 0.113, 0.211, 50000, 748], ["59150", "恒指法興八九牛Ｎ", 23838, 23738, 0.113, 0.251, 1070000, 748], ["57784", "恒指匯豐八九牛Ｘ", 23850, 23750, 0.11, 0.179, 1280000, 748], ["58498", "恒指摩通八八牛Ｕ", 23850, 23750, 0.114, 0.34, 630000, 719], ["60354", "恒指瑞銀八乙牛Ｄ", 23850, 23750, 0.112, 0.259, 90000, 839], ["60409", "恒指法興八甲牛Ｓ", 23878, 23778, 0.108, 0.211, 5690000, 810], ["58652", "恒指瑞銀八九牛Ｖ", 23888, 23788, 0.108, 0.251, 490000, 748], ["61044", "恒指匯豐八八牛Ｅ", 23888, 23788, 0.108, 0.251, 970000, 719], ["56859", "恒指摩通八乙牛Ｃ", 23900, 23800, 0.106, 0.219, 38600, 839], ["57410", "恒指瑞銀八十牛Ｈ", 23900, 23800, 0.105, 0.179, 62300, 780], ["60557", "恒指匯豐八九牛Ｆ", 23900, 23800, 0.106, 0.219, 1250000, 748], ["61362", "恒指瑞銀八十牛Ｚ", 23908, 23808, 0.106, 0.251, 0, 780], ["61745", "恒指法興八九牛Ｂ", 23908, 23808, 0.106, 0.251, 150000, 748], ["60784", "恒指瑞銀八十牛Ａ", 23918, 23818, 0.104, 0.211, 30000, 780], ["60107", "恒指摩通八乙牛Ｊ", 23950, 23850, 0.104, 0.34, 2320000, 839], ["61863", "恒指瑞銀八乙牛Ｅ", 23950, 23850, 0.101, 0.219, 1710000, 839], ["61456", "恒指法興八十牛Ｐ", 23958, 23858, 0.1, 0.211, 1760000, 780], ["63393", "恒指法興八乙牛Ｅ", 23978, 23878, 0.097, 0.171, 7440000, 839], ["62828", "恒指摩通八七牛Ｘ", 23980, 23880, 0.101, 0.34, 190000, 686], ["60098", "恒指摩通八乙牛Ｎ", 24000, 23900, 0.05, 0.38, 6650000, 839], ["60338", "恒指瑞銀八九牛Ｄ", 24000, 23900, 0.095, 0.179, 6740000, 748], ["61302", "恒指摩通八七牛４", 24000, 23900, 0.098, 0.3, 1850000, 686], ["61349", "恒指瑞銀八十牛Ｆ", 24000, 23900, 0.048, 0.219, 44300, 780], ["63984", "恒指法興八乙牛Ｈ", 24000, 23900, 0.049, 0.3, 2840000, 839], ["61065", "恒指法興八九牛４", 24008, 23908, 0.093, 0.13, 0, 748], ["60406", "恒指法興八九牛Ｕ", 24028, 23928, 0.091, 0.13, 500000, 748], ["61542", "恒指匯豐八九牛Ｌ", 24028, 23928, 0.094, 0.251, 40000, 748], ["60960", "恒指摩通八七牛５", 24030, 23930, 0.095, 0.3, 0, 686], ["61053", "恒指匯豐八八牛Ｆ", 24050, 23950, 0.092, 0.259, 370000, 719], ["61357", "恒指瑞銀八十牛Ｉ", 24050, 23950, 0.09, 0.179, 140000, 780], ["60768", "恒指瑞銀八十牛Ｗ", 24068, 23968, 0.087, 0.13, 1640000, 780], ["61451", "恒指法興八十牛Ａ", 24068, 23968, 0.088, 0.171, 1240000, 780], ["60527", "恒指匯豐八九牛Ｋ", 24100, 24000, 0.085, 0.179, 2230000, 748], ["61862", "恒指瑞銀八十牛Ｌ", 24100, 24000, 0.083, 0.098, 100000, 780], ["61913", "恒指摩通八七牛２", 24100, 24000, 0.088, 0.3, 390000, 686], ["61744", "恒指法興八十牛Ｕ", 24108, 24008, 0.083, 0.13, 550000, 780], ["60102", "恒指摩通八七牛６", 24120, 24020, 0.084, 0.219, 6160000, 686], ["60470", "恒指法興八乙牛Ｃ", 24128, 24028, 0.081, 0.13, 2890000, 839], ["62398", "恒指瑞銀八乙牛Ｉ", 24138, 24038, 0.081, 0.171, 360000, 839], ["60337", "恒指瑞銀八九牛Ｃ", 24150, 24050, 0.078, 0.098, 47900, 748], ["62062", "恒指匯豐八八牛Ｔ", 24150, 24050, 0.08, 0.179, 230000, 719], ["62800", "恒指摩通八七牛Ｑ", 24150, 24050, 0.081, 0.219, 80000, 686], ["61431", "恒指法興八九牛６", 24168, 24068, 0.076, 0.09, 250000, 748], ["61312", "恒指摩通八七牛Ｒ", 24170, 24070, 0.078, 0.179, 3280000, 686], ["61540", "恒指匯豐八九牛Ｊ", 24188, 24088, 0.075, 0.13, 2070000, 748], ["63199", "恒指瑞銀八乙牛Ｗ", 24188, 24088, 0.075, 0.13, 260000, 839], ["63370", "恒指法興八甲牛６", 24188, 24088, 0.075, 0.13, 2260000, 810], ["61405", "恒指瑞銀八十牛５", 24200, 24100, 0.072, 0.058, 590000, 780], ["61084", "恒指法興八甲牛Ｍ", 24208, 24108, 0.072, 0.09, 620000, 810], ["60782", "恒指瑞銀八十牛４", 24213, 24113, 0.072, 0.11, 300000, 780], ["60952", "恒指摩通八七牛３", 24213, 24113, 0.074, 0.191, 2200000, 686], ["61064", "恒指匯豐八八牛Ｌ", 24213, 24113, 0.072, 0.11, 2380000, 719], ["60452", "恒指法興八十牛Ｋ", 24228, 24128, 0.07, 0.09, 3300000, 780], ["61861", "恒指瑞銀八十牛Ｃ", 24250, 24150, 0.067, 0.058, 5110000, 780], ["61908", "恒指摩通八七牛Ｏ", 24250, 24150, 0.071, 0.219, 780000, 686], ["62059", "恒指匯豐八八牛Ｕ", 24250, 24150, 0.065, -0.022, 80000, 719], ["62405", "恒指法興八甲牛Ｑ", 24258, 24158, 0.069, 0.171, 1140000, 810], ["65958", "恒指法興八乙牛Ｍ", 24278, 24178, 0.065, 0.09, 2710000, 839], ["60526", "恒指匯豐八九牛Ｈ", 24288, 24188, 0.062, 0.01, 23800, 748], ["60099", "恒指摩通八乙牛Ｙ", 24300, 24200, 0.063, 0.098, 85700, 839], ["60336", "恒指瑞銀八九牛７", 24300, 24200, 0.061, 0.018, 22100, 748], ["63302", "恒指匯豐八九牛Ｒ", 24300, 24200, 0.062, 0.058, 11500, 748], ["61740", "恒指法興八九牛Ａ", 24308, 24208, 0.063, 0.13, 2660000, 748], ["62396", "恒指瑞銀八乙牛Ａ", 24318, 24218, 0.059, 0.01, 1700000, 839], ["62786", "恒指摩通八十牛Ｙ", 24320, 24220, 0.061, 0.098, 1270000, 780], ["63947", "恒指瑞銀八乙牛Ｇ", 24338, 24238, 0.058, 0.05, 610000, 839], ["63392", "恒指法興八乙牛Ｄ", 24348, 24248, 0.056, 0.01, 9420000, 839], ["62058", "恒指匯豐八八牛Ｗ", 24380, 24280, 0.051, -0.063, 2120000, 719], ["63068", "恒指瑞銀八乙牛Ｑ", 24388, 24288, 0.052, 0.01, 4670000, 839], ["63983", "恒指法興八九牛Ｇ", 24388, 24288, 0.051, -0.03, 5530000, 748], ["61860", "恒指瑞銀八十牛６", 24400, 24300, 0.051, 0.018, 11300, 780], ["61905", "恒指摩通八七牛Ｍ", 24400, 24300, 0.054, 0.139, 4620000, 686], ["61772", "恒指法興八十牛３", 24408, 24308, 0.05, 0.01, 3570000, 780], ["65641", "恒指瑞銀八七牛Ｙ", 24418, 24318, 0.05, 0.05, 2080000, 686], ["63246", "恒指匯豐八九牛Ｑ", 24428, 24328, 0.049, 0.05, 2230000, 748], ["67383", "恒指法興八乙牛Ｒ", 24428, 24328, 0.049, 0.05, 1450000, 839], ["63384", "恒指法興九一牛Ａ", 24448, 24348, 0.045, -0.03, 68900, 872], ["62562", "恒指匯豐八九牛７", 24450, 24350, 0.047, 0.058, 16500, 748], ["63943", "恒指瑞銀八十牛Ｙ", 24450, 24350, 0.045, -0.022, 430000, 780], ["65272", "恒指摩通八七牛Ｎ", 24450, 24350, 0.047, 0.058, 840000, 686], ["67476", "恒指瑞銀八七牛Ｕ", 24468, 24368, 0.043, -0.03, 50000, 686], ["62401", "恒指法興八九牛Ｆ", 24478, 24378, 0.042, -0.03, 6120000, 748], ["65357", "恒指匯豐八十牛Ｊ", 24488, 24388, 0.043, 0.05, 7710000, 780], ["66736", "恒指法興八甲牛Ｗ", 24488, 24388, 0.041, -0.03, 4430000, 810], ["56715", "恒指法興九一牛Ｋ", 24500, 24400, 0.02, -0.022, 28000, 872], ["61815", "恒指瑞銀八九牛Ｎ", 24500, 24400, 0.02, -0.022, 25000, 748], ["61894", "恒指摩通八七牛Ｋ", 24500, 24400, 0.022, 0.139, 1010000, 686], ["62381", "恒指瑞銀八乙牛Ｆ", 24500, 24400, 0.039, -0.063, 8350000, 839], ["62783", "恒指摩通八九牛７", 24500, 24400, 0.042, 0.058, 8290000, 748]]};
+var STALE = 0;
+
+function iso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function isEntry(d){ return ENTRY_DOW.indexOf(d.getDay())>=0; }
+function isExit(d){ return EXIT_DOW.indexOf(d.getDay())>=0; }
+function actionOf(d){ var e=isEntry(d), x=isExit(d); return (e&&x)?"BOTH":e?"ENTRY":x?"EXIT":"WAIT"; }
+function addDays(d,n){ var x=new Date(d.getTime()); x.setDate(x.getDate()+n); return x; }
+function nextEntry(from){ for(var i=0;i<9;i++){ var d=addDays(from,i); if(isEntry(d)) return d; } return null; }
+
+function renderToday(){
+  var t=new Date(), act=actionOf(t), nxt=nextEntry(addDays(t,1));
+  document.getElementById("hdr").textContent="今日 "+iso(t)+"（週"+WD[t.getDay()]+"）";
+  var el=document.getElementById("act"), meta=document.getElementById("actmeta");
+  el.textContent={ENTRY:"今日入場：買牛證過夜",EXIT:"今日出場：開盤賣出",
+    BOTH:"出場＋入場",WAIT:"今日唔做（空倉）"}[act];
+  el.className="act "+(act==="WAIT"?"wait":"go");
+  if(act==="ENTRY") meta.textContent=CFG.entryBy+" 前用限價單買入，買入價 = 當時賣出價（ask），唔好追。";
+  else if(act==="EXIT") meta.textContent=CFG.exitAt+" 開盤必須賣出昨晚嘅牛證。";
+  else if(act==="BOTH") meta.textContent=CFG.exitAt+" 開盤賣出 ＋ "+CFG.entryBy+" 前再買入牛證過夜。";
+  else meta.textContent=(nxt?("下一個入場日："+iso(nxt)+"（週"+WD[nxt.getDay()]+"）"):"");
+}
+function renderWeek(){
+  var t=new Date(), mon=addDays(t,-((t.getDay()+6)%7)), tb=document.getElementById("weekbody"), rows=[];
+  for(var i=0;i<5;i++){
+    var d=addDays(mon,i), a=actionOf(d), lbl, pil;
+    if(a==="ENTRY"){ lbl="入場"; pil="go"; }
+    else if(a==="BOTH"){ lbl="出場＋入場"; pil="exit"; }
+    else if(a==="EXIT"){ lbl="出場"; pil="exit"; }
+    else { lbl="唔做"; pil=""; }
+    rows.push('<tr'+(iso(d)===iso(t)?' class="today"':'')+'><td>'+iso(d)+'</td><td>週'+
+      WD[d.getDay()]+'</td><td><span class="pill '+pil+'">'+lbl+'</span></td></tr>');
+  }
+  tb.innerHTML=rows.join("");
+}
+
+function num(s){ if(s===null||s===undefined) return null;
+  var m=String(s).replace(/,/g,"").match(/[-+]?\d+(?:\.\d+)?/); return m?parseFloat(m[0]):null; }
+function qty(s){ if(!s) return 0; var mult=1;
+  if(s.indexOf("億")>=0) mult=1e8; else if(s.indexOf("百萬")>=0) mult=1e6; else if(s.indexOf("萬")>=0) mult=1e4;
+  return (num(s)||0)*mult; }
+function issuerOf(n){ for(var i=0;i<ISSUER_MAP.length;i++){ if(n.indexOf(ISSUER_MAP[i][0])>=0) return ISSUER_MAP[i][1]; } return n.slice(0,2); }
+function deriveRatio(kind,px,strike,price,prem){
+  if(!(price>0)||!(px>0)) return 10000;
+  var intr=(kind==="BULL")?(px-strike):(strike-px);
+  var raw=(prem/100*px+intr)/price;
+  if(!(raw>0)) return 10000;
+  var best=RATIOS[0];
+  for(var i=0;i<RATIOS.length;i++){ if(Math.abs(raw-RATIOS[i])/RATIOS[i] < Math.abs(raw-best)/best) best=RATIOS[i]; }
+  if(Math.abs(raw-best)/best<=0.05) return best;
+  return Math.round(raw/500)*500;
+}
+function parseEtnet(html){
+  var doc=new DOMParser().parseFromString(html,"text/html");
+  var trs=doc.querySelectorAll("tr.evenRow, tr.oddRow"), out=[];
+  for(var i=0;i<trs.length;i++){
+    var tds=trs[i].querySelectorAll("td");
+    if(tds.length<11) continue;
+    var c=[], j;
+    for(j=0;j<tds.length;j++) c.push((tds[j].textContent||"").replace(/\u00a0/g," ").trim());
+    var cm=c[0].match(/\d{5}/); if(!cm) continue;
+    var kind=c[2].indexOf("牛")>=0?"BULL":(c[2].indexOf("熊")>=0?"BEAR":"");
+    if(!kind) continue;
+    var rec=num(c[3]), str=num(c[4]), pr=num(c[6]);
+    if(rec===null||str===null||pr===null) continue;
+    out.push({code:cm[0],name:c[1],kind:kind,issuer:issuerOf(c[1]),recovery:rec,strike:str,
+      price:pr,premium:num(c[9])||0,volume:qty(c[8]),days:Math.round(num(c[10])||0)});
+  }
+  return out;
+}
+function seedRows(){
+  if(!SEED||!SEED.rows) return [];
+  return SEED.rows.map(function(a){
+    return {code:a[0],name:a[1],kind:"BULL",issuer:issuerOf(a[1]),recovery:a[2],
+            strike:a[3],price:a[4],premium:a[5],volume:a[6],days:a[7]};
+  });
+}
+function screenBulls(rows,px){
+  var ok=[];
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    if(r.kind!=="BULL"||!ALLOWED[r.issuer]) continue;
+    r.dist=px-r.recovery;
+    if(r.dist<CFG.recoveryMin||r.days<CFG.minDays) continue;
+    r.ratio=deriveRatio("BULL",px,r.strike,r.price,r.premium);
+    r.score=100-Math.abs(r.dist-450)/100-20+Math.min(r.volume/1e6,5);
+    ok.push(r);
+  }
+  ok.sort(function(a,b){ return b.score-a.score; });
+  return ok;
+}
+var PROXIES=[function(u){return "https://api.allorigins.win/raw?url="+encodeURIComponent(u);},
+             function(u){return "https://api.allorigins.win/get?url="+encodeURIComponent(u);}];
+function grab(url, tries){
+  tries = tries || 6;
+  var attempt = 0;
+  function once(){
+    attempt++;
+    var idx = (attempt-1) % PROXIES.length;
+    return fetch(PROXIES[idx](url),{cache:"no-store"}).then(function(r){
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      return r.text();
+    }).then(function(t){
+      if(idx===1) t = JSON.parse(t).contents;
+      if(!t||t.length<200) throw new Error("回應不完整");
+      return t;
+    }).catch(function(e){
+      if(attempt>=tries) throw e;
+      return new Promise(function(res){ setTimeout(res, 900); }).then(once);
+    });
+  }
+  return once();
+}
+function ymd(ts){ var d=new Date(ts*1000); return iso(new Date(d.getTime()-d.getTimezoneOffset()*60000)); }
+function fetchIndex(){
+  return grab("https://query1.finance.yahoo.com/v8/finance/chart/%5EHSI?range=1mo&interval=1d", 6)
+   .then(function(t){
+     var r=JSON.parse(t).chart.result[0], m=r.meta, q=r.indicators.quote[0], ts=r.timestamp||[];
+     var today=iso(new Date()), prev=null;
+     for(var i=ts.length-1;i>=0;i--){ if(ymd(ts[i])<today && q.close[i]!==null){ prev=q.close[i]; break; } }
+     return {last:m.regularMarketPrice, prev:(prev!==null?prev:m.chartPreviousClose)};
+   });
+}
+function setStatus(s,cls){ var e=document.getElementById("status"); e.innerHTML=s; e.className="st"+(cls?" "+cls:""); }
+function showIndex(px,prev){
+  document.getElementById("hsi").textContent = px?Math.round(px).toLocaleString():"—";
+  if(px&&prev){
+    var ch=px-prev, el=document.getElementById("hsiChg");
+    el.textContent=(ch>=0?"+":"")+ch.toFixed(0)+" 點（"+(ch>=0?"+":"")+(ch/prev*100).toFixed(2)+"%）";
+    el.className="v "+(ch>=0?"up":"down");
+  }
+}
+function renderPicks(list,note){
+  var html = list.map(function(c){
+    return '<div class="card"><span class="code">'+c.code+'</span><span class="nm">'+(c.name||"")+'</span>'
+      +'<div class="grid">'
+      +'<div><span class="k">發行商</span><span class="v">'+(ALLOWED[c.issuer]||c.issuer||"—")+'</span></div>'
+      +'<div><span class="k">收回價</span><span class="v">'+Math.round(c.recovery).toLocaleString()+'</span></div>'
+      +'<div><span class="k">距現價</span><span class="v">'+Math.round(c.dist||0)+' 點</span></div>'
+      +'<div><span class="k">行使價</span><span class="v">'+Math.round(c.strike).toLocaleString()+'</span></div>'
+      +'<div><span class="k">證價</span><span class="v">'+(+c.price).toFixed(3)+'</span></div>'
+      +'<div><span class="k">換股比率</span><span class="v">'+(c.ratio?c.ratio.toLocaleString():"—")+'</span></div>'
+      +'<div><span class="k">距到期</span><span class="v">'+c.days+' 天</span></div>'
+      +'<div><span class="k">1 手成本</span><span class="v">$'+Math.round(c.price*CFG.lot).toLocaleString()+'</span></div>'
+      +'</div><div class="note" style="margin-top:7px">買 1 手（10,000 股）。每 0.01 元 = $100。</div></div>';
+  }).join("");
+  if(!list.length) html='<div class="note" style="margin-top:9px">用呢個恆指水平計，冇牛證符合條件 —— 寧願唔做。</div>';
+  document.getElementById("picks").innerHTML = html + (note?'<div class="note" style="margin-top:8px">'+note+'</div>':"");
+}
+function draw(list, px, note){
+  if(px) showIndex(px, null);
+  renderPicks(list.slice(0,5), note + (list.length>5?("（另有 "+(list.length-5)+" 隻符合）"):""));
+}
+function fromSeed(px, label){
+  var rows=seedRows();
+  if(!rows.length) return 0;
+  var usePx = px || (SEED && SEED.px);
+  var ok = screenBulls(rows, usePx);
+  draw(ok, null, "數據源："+label+"（恆指 "+Math.round(usePx).toLocaleString()+
+    "）。證價同尚餘日數係快照，落單前請用券商報價核對。");
+  return ok.length;
+}
+function refresh(){
+  var btn=document.getElementById("btn"); btn.disabled=true;
+  setStatus("抓取恆指報價…");
+  var px=null;
+  fetchIndex().then(function(q){
+    px=q.last||q.prev;
+    showIndex(px,q.prev);
+    STALE=0;
+    var n = fromSeed(px, "內置快照 "+SEED.t);
+    setStatus("恆指報價已更新。快照有 "+n+" 隻合格牛證；跟住試抓最新 etnet 清單…");
+    return grab("https://www.etnet.com.hk/www/tc/warrants/search_cbbc_hsi.php", 4);
+  }).then(function(html){
+    var rows=parseEtnet(html);
+    if(!rows.length) throw new Error("etnet 表格解析失敗");
+    var ok=screenBulls(rows,px);
+    draw(ok, px, "數據源：etnet 即時全表（延遲 ≥15 分鐘），"+rows.length+" 隻之中 "+ok.length+" 隻合格。");
+    setStatus("更新時間 "+new Date().toLocaleString("zh-HK"));
+    btn.disabled=false;
+  }).catch(function(e){
+    setStatus("即時清單抓取失敗（"+e.message+"）。"+
+      (px!==null?"上面已用最新恆指配內置快照重新篩選，可以用。":"手機可能冇網絡。"),"wn");
+    btn.disabled=false;
+  });
+}
+document.getElementById("btn").addEventListener("click",refresh);
+renderToday(); renderWeek();
+if(SEED) fromSeed(null, "內置快照 "+SEED.t);
+if(!ISON) setStatus("離線模式。日曆、規則、統計、牛證快照全部照用；撳「更新」試抓即時報價。");
+setTimeout(refresh,250);
+</script>
+</body>
+</html>
